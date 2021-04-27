@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mai.SalaryComputation.CLI", "Mai.SalaryComputation.CLI\Mai.SalaryComputation.CLI.csproj", "{36AB9487-70C8-46F7-9670-E244420AF582}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mai.SalaryComputation.Domain", "Mai.SalaryComputation.Domain\Mai.SalaryComputation.Domain.csproj", "{347002F5-B07D-482F-8464-68EFD13FA936}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mai.SalaryComputation.Infrastructure", "Mai.SalaryComputation.Infrastructure\Mai.SalaryComputation.Infrastructure.csproj", "{B170D57B-4A14-42ED-B8BC-396E120FE3A8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{36AB9487-70C8-46F7-9670-E244420AF582}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36AB9487-70C8-46F7-9670-E244420AF582}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36AB9487-70C8-46F7-9670-E244420AF582}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36AB9487-70C8-46F7-9670-E244420AF582}.Release|Any CPU.Build.0 = Release|Any CPU
+		{347002F5-B07D-482F-8464-68EFD13FA936}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{347002F5-B07D-482F-8464-68EFD13FA936}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{347002F5-B07D-482F-8464-68EFD13FA936}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{347002F5-B07D-482F-8464-68EFD13FA936}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B170D57B-4A14-42ED-B8BC-396E120FE3A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B170D57B-4A14-42ED-B8BC-396E120FE3A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B170D57B-4A14-42ED-B8BC-396E120FE3A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B170D57B-4A14-42ED-B8BC-396E120FE3A8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+	EndGlobalSection
+EndGlobal
