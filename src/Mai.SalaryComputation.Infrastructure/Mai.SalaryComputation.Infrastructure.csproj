@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <LangVersion>9</LangVersion>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="HtmlAgilityPack" Version="1.11.33" />
+        <PackageReference Include="Open-XML-SDK" Version="2.9.1" />
+        <PackageReference Include="Tokenizer" Version="2.2.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Mai.SalaryComputation.Domain\Mai.SalaryComputation.Domain.csproj" />
+    </ItemGroup>
+
+</Project>
