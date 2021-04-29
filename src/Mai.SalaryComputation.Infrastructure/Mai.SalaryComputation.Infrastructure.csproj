@@ -8,8 +8,18 @@
 
     <ItemGroup>
         <PackageReference Include="HtmlAgilityPack" Version="1.11.33" />
+        <PackageReference Include="Microsoft.Extensions.Configuration" Version="5.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="5.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
         <PackageReference Include="Open-XML-SDK" Version="2.9.1" />
         <PackageReference Include="Tokenizer" Version="2.2.2" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.5" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Analyzers" Version="5.0.5" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="5.0.5" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.5" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.5" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.5" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.5" />
     </ItemGroup>
 
     <ItemGroup>

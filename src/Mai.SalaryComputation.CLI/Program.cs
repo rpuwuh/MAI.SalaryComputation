@@ -4,7 +4,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Mai.SalaryComputation.CLI.Configs;
 using Mai.SalaryComputation.Domain.Abstractions;
+using Mai.SalaryComputation.Infrastructure.DataAccess;
 using Mai.SalaryComputation.Infrastructure.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -46,6 +48,9 @@ namespace Mai.SalaryComputation.CLI
 
             services.Configure<AppConfig>(config.GetSection("App"));
 
+            services.AddDbContext<ApplicationDbContext>(opt => opt.UseSqlite(config.GetConnectionString("Application")));
+
+            services.AddTransient<IApplicationDbContext, ApplicationDbContext>();
             services.AddTransient<IScheduleParser, ExcelScheduleParser>();
             services.AddTransient<ICurriculumParser, HtmlCurriculumParser>();
 
@@ -58,7 +63,7 @@ namespace Mai.SalaryComputation.CLI
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+                .AddJsonFile("appsettings.json", false, true);
 
             return builder.Build();
         }
