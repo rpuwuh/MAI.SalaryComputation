@@ -51,6 +51,9 @@ namespace Mai.SalaryComputation.CLI
             services.AddDbContext<ApplicationDbContext>(opt => opt.UseSqlite(config.GetConnectionString("Application")));
 
             services.AddTransient<IApplicationDbContext, ApplicationDbContext>();
+            
+            services.AddTransient<IProcessedFileService, ProcessedFileService>();
+            
             services.AddTransient<IScheduleParser, ExcelScheduleParser>();
             services.AddTransient<ICurriculumParser, HtmlCurriculumParser>();
 

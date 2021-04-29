@@ -24,6 +24,8 @@ namespace Mai.SalaryComputation.CLI
 
         private readonly ICurriculumParser _curriculumParser;
 
+        private readonly IProcessedFileService _processedFileService;
+
         private readonly AppConfig _appConfig;
 
         private readonly JsonSerializerSettings _serializerSettings;
@@ -31,11 +33,13 @@ namespace Mai.SalaryComputation.CLI
         public Application(ILogger<Application> logger,
             IScheduleParser scheduleParser,
             ICurriculumParser curriculumParser,
+            IProcessedFileService processedFileService,
             IOptions<AppConfig> appConfig)
         {
             _logger = logger;
             _scheduleParser = scheduleParser;
             _curriculumParser = curriculumParser;
+            _processedFileService = processedFileService;
             _appConfig = appConfig.Value;
             _serializerSettings = new JsonSerializerSettings
             {
@@ -69,10 +73,7 @@ namespace Mai.SalaryComputation.CLI
         {
             _logger.LogInformation("Start parsing schedules");
 
-            var excelFiles = Directory
-                .GetFiles(_appConfig.InputPath, "*.*", SearchOption.AllDirectories)
-                .Where(s => s.EndsWith(".xlsx") || s.EndsWith(".xls"))
-                .ToList();
+            var excelFiles = GetFilesWithExt(_appConfig.InputPath, ".xlsx", ".xls").ToList();
 
             _logger.LogInformation($"Count of schedules files is {excelFiles.Count}");
 
@@ -84,16 +85,34 @@ namespace Mai.SalaryComputation.CLI
 
                     await using var fs = new FileStream(excelFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 
+                    var isContains = await _processedFileService.Contains(fs);
+
+                    if (isContains)
+                    {
+                        _logger.LogInformation("Skipped..");
+
+                        continue;
+                    }
+
+                    if (fs.CanSeek)
+                    {
+                        fs.Seek(0, SeekOrigin.Begin);
+                    }
+                    
                     var parserResult = _scheduleParser.Execute(fs);
 
-                    var json = JsonConvert.SerializeObject(parserResult, Formatting.Indented, _serializerSettings);
+                    var json = JsonConvert.SerializeObject(parserResult, Formatting.None, _serializerSettings);
 
                     _logger.LogInformation(json);
 
-                    var fileMame = "schedule-" + Path.GetFileNameWithoutExtension(excelFile) +
-                                   DateTime.Now.ToString("dd-MM-yyyy_hh-mm-ss-tt") + ".json";
+                    await SaveJsonFile(_appConfig.OutputPath, "Schedule", excelFile, json);
+                    
+                    if (fs.CanSeek)
+                    {
+                        fs.Seek(0, SeekOrigin.Begin);
+                    }
 
-                    await SaveFile(_appConfig.OutputPath, fileMame, json);
+                    await _processedFileService.Add(fs, json);
                 }
                 catch (Exception e)
                 {
@@ -106,10 +125,7 @@ namespace Mai.SalaryComputation.CLI
         {
             _logger.LogInformation("Start parsing curriculums");
 
-            var htmlFiles = Directory
-                .GetFiles(_appConfig.InputPath, "*.*", SearchOption.AllDirectories)
-                .Where(s => s.EndsWith(".htm"))
-                .ToList();
+            var htmlFiles = GetFilesWithExt(_appConfig.InputPath, ".htm").ToList();
 
             _logger.LogInformation($"Count of curriculums files is {htmlFiles.Count}");
 
@@ -120,19 +136,37 @@ namespace Mai.SalaryComputation.CLI
                 try
                 {
                     await using var fs = new FileStream(htmlFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    
+                    var isContains = await _processedFileService.Contains(fs);
+                    
+                    if (isContains)
+                    {
+                        _logger.LogInformation("Skipped..");
+                    
+                        continue;
+                    }
+                    
+                    if (fs.CanSeek)
+                    {
+                        fs.Seek(0, SeekOrigin.Begin);
+                    }
 
                     var html = await fs.ReadAsStringAsync();
 
                     var parserResult = _curriculumParser.Execute(html);
 
-                    var json = JsonConvert.SerializeObject(parserResult, Formatting.Indented, _serializerSettings);
+                    var json = JsonConvert.SerializeObject(parserResult, Formatting.None, _serializerSettings);
 
                     _logger.LogInformation(json);
-                    
-                    var fileMame = "curriculum-" + Path.GetFileNameWithoutExtension(htmlFile) +
-                                   DateTime.Now.ToString("dd-MM-yyyy_hh-mm-ss-tt") + ".json";
 
-                    await SaveFile(_appConfig.OutputPath, fileMame, json);
+                    await SaveJsonFile(_appConfig.OutputPath, "Curriculum", htmlFile, json);
+
+                     if (fs.CanSeek)
+                     {
+                         fs.Seek(0, SeekOrigin.Begin);
+                     }
+
+                    await _processedFileService.Add(fs, json);
                 }
                 catch (Exception e)
                 {
@@ -141,14 +175,23 @@ namespace Mai.SalaryComputation.CLI
             }
         }
 
-        public static Task SaveFile(string path, string fileName, string json)
+        public static IEnumerable<string> GetFilesWithExt(string path, params string[] ext)
+        {
+            return Directory.GetFiles(path, "*.*", SearchOption.AllDirectories)
+                .Where(s => !ext.Any() || ext.Any(s.EndsWith))
+                .ToArray();
+        }
+
+        public static Task SaveJsonFile(string path, string prefix, string fileName, string json)
         {
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);
             }
 
-            return File.WriteAllTextAsync(Path.Combine(path, fileName), json, Encoding.UTF8);
+            var name = $"{prefix}_[{DateTime.Now:dd-MM-yyyy_hh-mm-ss-tt}]_[{Path.GetFileNameWithoutExtension(fileName)}].json";
+
+            return File.WriteAllTextAsync(Path.Combine(path, name), json, Encoding.UTF8);
         }
     }
 }

@@ -20,9 +20,7 @@ namespace Mai.SalaryComputation.Infrastructure.Services
 
             var result = new CurriculumModel
             {
-                CurriculumNumber =
-                    _numberRegex.Replace(document.GetStringOfDefault("/html[1]/body[1]/table[1]/tr[3]/td[3]"),
-                        string.Empty),
+                CurriculumNumber = _numberRegex.Replace(document.GetStringOfDefault("/html[1]/body[1]/table[1]/tr[3]/td[3]"), string.Empty),
                 GraduatingDepartment = document.GetStringOfDefault("/html[1]/body[1]/table[1]/tr[2]/td[3]"),
                 Department = document.GetStringOfDefault("/html[1]/body[1]/table[3]/tr[2]/td[4]"),
                 Faculty = document.GetNumberOrDefault("/html[1]/body[1]/table[3]/tr[2]/td[5]"),
@@ -35,7 +33,6 @@ namespace Mai.SalaryComputation.Infrastructure.Services
                 GroupNumbers = document.GetCollectionOfChildElements("/html[1]/body[1]/table[3]/tr[2]/td[12]"),
                 WeekCount = document.GetNumberOrDefault("/html[1]/body[1]/table[3]/tr[2]/td[14]")
             };
-
 
             var disciplineTableRows = document.DocumentNode.SelectSingleNode("/html[1]/body[1]/table[5]")?.ChildNodes;
 
