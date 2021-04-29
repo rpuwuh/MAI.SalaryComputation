@@ -24,7 +24,7 @@ namespace Mai.SalaryComputation.Infrastructure.Extensions
                 str = NumberRegex.Replace(str, string.Empty);
             }
 
-            return int.TryParse(str, out var number) ? number : null;
+            return int.TryParse(str, out var number) ? number : (int?) null;
         }
 
         public static string GetStringOfDefault(this HtmlDocument htmlDocument, string xpath)
@@ -42,6 +42,7 @@ namespace Mai.SalaryComputation.Infrastructure.Extensions
             return htmlDocument?.DocumentNode?.SelectSingleNode(xpath)
                 ?.ChildNodes
                 ?.Select(x => WebUtility.HtmlDecode(x?.InnerText ?? string.Empty))
+                .Where(x => !string.IsNullOrWhiteSpace(x))
                 .ToList() ?? new List<string>();
         }
     }

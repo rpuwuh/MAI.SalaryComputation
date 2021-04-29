@@ -108,7 +108,7 @@ namespace Mai.SalaryComputation.CLI
 
             var htmlFiles = Directory
                 .GetFiles(_appConfig.InputPath, "*.*", SearchOption.AllDirectories)
-                .Where(s => s.EndsWith(".html"))
+                .Where(s => s.EndsWith(".htm"))
                 .ToList();
 
             _logger.LogInformation($"Count of curriculums files is {htmlFiles.Count}");

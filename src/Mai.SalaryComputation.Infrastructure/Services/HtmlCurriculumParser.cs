@@ -18,65 +18,84 @@ namespace Mai.SalaryComputation.Infrastructure.Services
 
             document.LoadHtml(html);
 
-            var result = new CurriculumModel();
-
-            result.GraduatingDepartment = document.GetStringOfDefault("/html/body/table[1]/tbody/tr[2]/td[3]/p/span");
-            result.Department = document.GetStringOfDefault("/html/body/table[3]/tbody/tr[2]/td[4]/p/span");
-            result.Faculty = document.GetNumberOrDefault("/html/body/table[3]/tbody/tr[2]/td[5]/p/span");
-            result.Course = document.GetNumberOrDefault("/html/body/table[3]/tbody/tr[2]/td[6]/p/span");
-            result.Semester = document.GetNumberOrDefault("/html/body/table[3]/tbody/tr[2]/td[7]/p/span");
-            result.Direction = document.GetStringOfDefault("/html/body/table[3]/tbody/tr[2]/td[8]/p/span");
-            result.Profile = document.GetStringOfDefault("/html/body/table[3]/tbody/tr[2]/td[9]/p/span");
-            result.GroupsCount = document.GetNumberOrDefault("/html/body/table[3]/tbody/tr[2]/td[10]/p/span");
-            result.StudentsCount = document.GetNumberOrDefault("/html/body/table[3]/tbody/tr[2]/td[11]/p/span");
-            result.GroupNumbers = document.GetCollectionOfChildElements("/html/body/table[3]/tbody/tr[2]/td[12]");
-            result.WeekCount = document.GetNumberOrDefault("/html/body/table[3]/tbody/tr[2]/td[14]/p/span");
-            result.CurriculumNumber = _numberRegex.Replace(document.GetStringOfDefault("/html/body/table[1]/tbody/tr[3]/td[3]/p/span"), string.Empty);
-
-            var disciplineTableRows = document.DocumentNode.SelectSingleNode("/html/body/table[5]/tbody").ChildNodes;
-
-            foreach (var tableRow in disciplineTableRows)
+            var result = new CurriculumModel
             {
-                var number = tableRow.GetNumberOrDefault("./td[2]/p/span");
+                CurriculumNumber =
+                    _numberRegex.Replace(document.GetStringOfDefault("/html[1]/body[1]/table[1]/tr[3]/td[3]"),
+                        string.Empty),
+                GraduatingDepartment = document.GetStringOfDefault("/html[1]/body[1]/table[1]/tr[2]/td[3]"),
+                Department = document.GetStringOfDefault("/html[1]/body[1]/table[3]/tr[2]/td[4]"),
+                Faculty = document.GetNumberOrDefault("/html[1]/body[1]/table[3]/tr[2]/td[5]"),
+                Course = document.GetNumberOrDefault("/html[1]/body[1]/table[3]/tr[2]/td[6]"),
+                Semester = document.GetNumberOrDefault("/html[1]/body[1]/table[3]/tr[2]/td[7]"),
+                Direction = document.GetStringOfDefault("/html[1]/body[1]/table[3]/tr[2]/td[8]"),
+                Profile = document.GetStringOfDefault("/html[1]/body[1]/table[3]/tr[2]/td[9]"),
+                GroupsCount = document.GetNumberOrDefault("/html[1]/body[1]/table[3]/tr[2]/td[10]"),
+                StudentsCount = document.GetNumberOrDefault("/html[1]/body[1]/table[3]/tr[2]/td[11]"),
+                GroupNumbers = document.GetCollectionOfChildElements("/html[1]/body[1]/table[3]/tr[2]/td[12]"),
+                WeekCount = document.GetNumberOrDefault("/html[1]/body[1]/table[3]/tr[2]/td[14]")
+            };
 
-                if (!number.HasValue)
+
+            var disciplineTableRows = document.DocumentNode.SelectSingleNode("/html[1]/body[1]/table[5]")?.ChildNodes;
+
+            if (disciplineTableRows != null)
+            {
+                foreach (var tableRow in disciplineTableRows)
                 {
-                    continue;
+                    var number = tableRow.GetNumberOrDefault("./td[2]");
+
+                    if (!number.HasValue)
+                    {
+                        continue;
+                    }
+
+                    var curriculumDiscipline = new CurriculumDisciplineModel
+                    {
+                        Number = tableRow.GetStringOfDefault("./td[2]"),
+                        Name = tableRow.GetStringOfDefault("./td[3]"),
+                        SupportingDepartment = tableRow.GetStringOfDefault("./td[4]"),
+                        Flow = tableRow.GetNumberOrDefault("./td[5]"),
+                        FlowAttribute = tableRow.GetStringOfDefault("./td[6]"),
+                        CountOfLecture = tableRow.GetNumberOrDefault("./td[10]") ?? 0,
+                        CountOfLaboratoryLessons = tableRow.GetNumberOrDefault("./td[11]") ?? 0,
+                        CountOfPracticalLessons = tableRow.GetNumberOrDefault("./td[12]") ?? 0,
+                        CountOfCourseProjects = tableRow.GetNumberOrDefault("./td[14]") ?? 0,
+                        CountOfCourseWorks = tableRow.GetNumberOrDefault("./td[15]") ?? 0,
+                        CountOfCalculationAndGraphicWorks = tableRow.GetNumberOrDefault("./td[16]") ?? 0,
+                        CountOfHomeWorks = tableRow.GetNumberOrDefault("./td[17]") ?? 0,
+                        ControlType = tableRow.GetStringOfDefault("./td[24]"),
+                    };
+
+                    result.Disciplines.Add(curriculumDiscipline);
                 }
-
-                var curriculumDiscipline = new CurriculumDisciplineModel();
-
-                curriculumDiscipline.Number = tableRow.GetStringOfDefault("./td[2]/p/span");
-                curriculumDiscipline.Name = tableRow.GetStringOfDefault("./td[3]/p/span");
-                curriculumDiscipline.SupportingDepartment= tableRow.GetStringOfDefault("./td[4]/p/span");
-                curriculumDiscipline.Flow = tableRow.GetNumberOrDefault("./td[5]/p/span");
-                curriculumDiscipline.FlowAttribute = tableRow.GetStringOfDefault("./td[6]/p/span");
-
-                result.Disciplines.Add(curriculumDiscipline);
             }
 
-            var flowTableRows = document.DocumentNode.SelectSingleNode("/html/body/table[6]/tbody").ChildNodes;
+            var flowTableRows = document.DocumentNode.SelectSingleNode("/html[1]/body[1]/table[6]")?.ChildNodes;
 
-            foreach (var tableRow in flowTableRows)
+            if (flowTableRows != null)
             {
-                var number = tableRow.GetNumberOrDefault("./td[2]/p/span");
-
-                if (!number.HasValue)
+                foreach (var tableRow in flowTableRows)
                 {
-                    continue;
+                    var number = tableRow.GetNumberOrDefault("./td[2]");
+
+                    if (!number.HasValue)
+                    {
+                        continue;
+                    }
+
+                    var curriculumFlow = new CurriculumFlowModel();
+
+                    var flowGroups = tableRow.GetStringOfDefault("./td[3]")
+                        .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                        .Select(x => x.Trim())
+                        .ToList();
+
+                    curriculumFlow.FlowNumber = number.Value;
+                    curriculumFlow.GroupNumbers = flowGroups;
+
+                    result.Flows.Add(curriculumFlow);
                 }
-
-                var curriculumFlow = new CurriculumFlowModel();
-
-                var flowGroups = tableRow.GetStringOfDefault("./td[3]/p/span")
-                    .Split(',', StringSplitOptions.RemoveEmptyEntries)
-                    .Select(x=>x.Trim())
-                    .ToList();
-
-                curriculumFlow.FlowNumber = number.Value;
-                curriculumFlow.GroupNumbers = flowGroups;
-
-                result.Flows.Add(curriculumFlow);
             }
 
             return result;
